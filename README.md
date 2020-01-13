@@ -58,3 +58,111 @@ sudo sbin/nginx -s reload
 #停止
 
 sudo sbin/nginx -s stop
+
+
+## 3. nginx的 配置语法
+
+1. 配置文件由指令和指令块构成
+
+2. 每条指令由分号;结尾，指令与参数间以空格符号分隔
+
+3. 指令块以{}打括号将多条指令组织 在一起
+
+4. include语句允许组合多个配置文件以提升可维护性
+
+5. 使用#符号添加注释，提高可读性
+
+6. 使用$符号使用变量
+
+7. 部分指令的参数支持正则表达式
+
+
+```conf
+user  nginx; #设置nginx服务的系统使用用户
+worker_processes  1; #工作进程数
+
+error_log  /var/log/nginx/error.log warn; #nginx的错误日志
+pid        /var/run/nginx.pid; #nginx启动时候的pid
+
+events {
+    worker_connections  1024; #每个进程允许的最大连接数
+}
+
+http { #http请求配置，一个http可以包含多个server
+
+    #定义 Content-Type
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    #日志格式 此处main与access_log中的main对应
+    #$remote_addr：客户端地址
+    #$remote_user：http客户端请求nginx认证的用户名，默认不开启认证模块，不会记录
+    #$timelocal：nginx的时间
+    #$request：请求method + 路由 + http协议版本
+    #status：http reponse 状态码
+    #body_bytes_sent：response body的大小
+    #$http_referer：referer头信息参数，表示上级页面
+    #$http_user_agent：user-agent头信息参数，客户端信息
+    #$http_x_forwarded_for：x-forwarded-for头信息参数
+    log_format  main  '$http_user_agent' '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #访问日志，后面的main表示使用log_format中的main格式记录到access.log中
+    access_log  /var/log/nginx/access.log  main;
+
+    #nginx的一大优势，高效率文件传输
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #客户端与服务端的超时时间，单位秒
+    keepalive_timeout  65;
+
+    #gzip  on;
+    server { #http服务，一个server可以配置多个location
+        listen       80; #服务监听端口
+        server_name  localhost; #主机名、域名
+    
+        #charset koi8-r;
+        #access_log  /var/log/nginx/host.access.log  main;
+    
+        location / {
+            root   /usr/share/nginx/html; #页面存放目录
+            index  index.html index.htm; #默认页面
+        }
+    
+        #error_page  404              /404.html;
+    
+        # 将500 502 503 504的错误页面重定向到 /50x.html
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html { #匹配error_page指定的页面路径
+            root   /usr/share/nginx/html; #页面存放的目录
+        }
+    
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+    
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+    
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
