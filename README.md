@@ -1,8 +1,11 @@
-# nginx-learn
+# nginx学习
 
-## 1. nginx 的优点
+## 1. 初识nginx
 
-1. nginx 相对 apache 的优点：
+### 1.1. nginx 的优点
+
+nginx 相对 apache 的优点：
+
 - 轻量级，同样起web 服务，比apache 占用更少的内存及资源
 - 抗并发，nginx 处理请求是异步非阻塞的，而apache 则是阻塞型的，在高并发下nginx 能保持低资源低消耗高性能
 - 高度模块化的设计，编写模块相对简单
@@ -11,17 +14,17 @@
 - Nginx支持7层负载均衡
 - nginx 适合做静态，简单，效率高
 
-2. 作为 Web 服务器：相比 Apache，Nginx 使用更少的资源，支持更多的并发连接，体现更高的效率，这点使 Nginx 尤其受到虚拟主机提供商的欢迎。在高连接并发的情况下，Nginx是Apache服务器不错的替代品: Nginx在美国是做虚拟主机生意的老板们经常选择的软件平台之一. 能够支持高达 50000 个并发连接数的响应, 感谢Nginx为我们选择了 epoll and kqueue 作为开发模型.  
-3. 
-Nginx作为负载均衡服务器: Nginx 既可以在内部直接支持 Rails 和 PHP 程序对外进行服务, 也可以支持作为 HTTP代理服务器对外进行服务. Nginx采用C进行编写, 不论是系统资源开销还是CPU使用效率都比 Perlbal 要好很多.
+1. 作为 Web 服务器：相比 Apache，Nginx 使用更少的资源，支持更多的并发连接，体现更高的效率，这点使 Nginx 尤其受到虚拟主机提供商的欢迎。在高连接并发的情况下，Nginx是Apache服务器不错的替代品: Nginx在美国是做虚拟主机生意的老板们经常选择的软件平台之一. 能够支持高达 50000 个并发连接数的响应, 感谢Nginx为我们选择了 epoll and kqueue 作为开发模型.
+
+2. Nginx作为负载均衡服务器: Nginx 既可以在内部直接支持 Rails 和 PHP 程序对外进行服务, 也可以支持作为 HTTP代理服务器对外进行服务. Nginx采用C进行编写, 不论是系统资源开销还是CPU使用效率都比 Perlbal 要好很多.
 
 3. Nginx 配置简洁, Apache 复杂 ，Nginx 启动特别容易, 并且几乎可以做到7*24不间断运行，即使运行数个月也不需要重新启动. 你还能够不间断服务的情况下进行软件版本的升级 . Nginx 静态处理性能比 Apache 高 3倍以上 ，Apache 对 PHP 支持比较简单，Nginx 需要配合其他后端来使用 ,Apache 的组件比 Nginx 多.
 
-4. 最核心的区别在于apache是同步多进程模型，一个连接对应一个进程；nginx是异步的，多个连接（万级别）可以对应一个进程 .
+4. 最核心的区别在于apache是同步多进程模型，一个连接对应一个进程；nginx是异步的，多个连接（万级别）可以对应一个进程.
 
- 5. nginx的优势是处理静态请求，cpu内存使用率低，apache适合处理动态请求，所以现在一般前端用nginx作为反向代理抗住压力，apache作为后端处理动态请求。
+5. nginx的优势是处理静态请求，cpu内存使用率低，apache适合处理动态请求，所以现在一般前端用nginx作为反向代理抗住压力，apache作为后端处理动态请求。
 
-## 2. nginx 的 编译安装
+### 1.2. nginx 的 编译安装
 
 下载页: http://nginx.org/en/download.html
 
@@ -49,20 +52,17 @@ cd /usr/local/nginx
 
 sudo sbin/nginx     #浏览器访问 127.0.0.1 测试是否成功启动
 
-
 #重启
 
 sudo sbin/nginx -s reload
-
 
 #停止
 
 sudo sbin/nginx -s stop
 
+### 1.3. nginx.conf配置文件详解
 
-## 3. nginx.conf配置文件详解
-
-### 3.1. nginx配置文件结构
+#### 1.3.1. nginx配置文件结构
 
 nginx配置文件主要分为六个区域：
 main(全局设置)、events(nginx工作模式)、http(http设置)、sever(主机设置)、location(URL匹配)、upstream(负载均衡服务器设置
@@ -420,7 +420,7 @@ http {
 }
 ```
 
-### 3.2. nginx的 配置语法
+#### 1.3.2. nginx的 配置语法
 
 1. 配置文件由指令和指令块构成
 
@@ -439,6 +439,7 @@ http {
 - 指令值的单位
 
 | 单位 | 描述 |
+| --- | --- |
 | k/K | 千字节 |
 | m/M | 兆字节 |
 | ms | Milliseconds–毫秒 |
@@ -450,7 +451,7 @@ http {
 | m | Months–月(30天) |
 | y | Years–年(365天) |
 
-### 3.3. nginx的 命令行
+#### 1.3.3. nginx的 命令行
 
 sudo nginx   #启动 nginx  
 nginx -s reload|reopen|stop|quit  #重新加载配置|重启|停止|退出  
@@ -459,11 +460,26 @@ nginx -t   #测试配置文件
 nginx [-?hvVtq] [-s signal] [-c filename] [-p prefix] [-g directives]  
 
 -?,-h           : 打开帮助信息  
--v               : 显示版本信息并退出  
--V               : 显示版本和配置选项信息，然后退出  
--t                : 检测配置文件是否有语法错误，然后退出  
--q               : 在检测配置文件期间屏蔽非错误信息  
+-v              : 显示版本信息并退出  
+-V              : 显示版本和配置选项信息，然后退出  
+-t              : 检测配置文件是否有语法错误，然后退出  
+-q              : 在检测配置文件期间屏蔽非错误信息  
 -s signal       : 给一个 nginx 主进程发送信号：stop（停止）, quit（退出）, reopen（重启）, reload（重新加载配置文件）  
--p prefix        : 设置前缀路径（默认是：/usr/local/Cellar/nginx/1.2.6/）  
--c filename      : 设置配置文件（默认是：/usr/local/etc/nginx/nginx.conf）  
--g directives    : 设置配置文件外的全局指令  
+-p prefix       : 设置前缀路径（默认是：/usr/local/Cellar/nginx/1.2.6/）  
+-c filename     : 设置配置文件（默认是：/usr/local/etc/nginx/nginx.conf）  
+-g directives   : 设置配置文件外的全局指令  
+
+## 2. nginx 架构
+
+### 2.1. nginx的请求处理流程
+
+### 2.2. nginx的进程结构
+
+### 2.3. 使用信号管理nginx的父子进程
+
+### 2.4. reload重载配置文件
+
+### 2.5. 热升级
+
+### 2.6. nginx 事件驱动模型
+
